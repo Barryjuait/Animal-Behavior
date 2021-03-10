@@ -1,0 +1,48 @@
+#include <CapacitiveSensor.h>
+
+int LED1 = 8; //RIGHT
+int LED2 = 13; //LEFT
+CapacitiveSensor   cs_1 = CapacitiveSensor(11,12); // capacitivesensor(output, input)
+CapacitiveSensor   cs_2 = CapacitiveSensor(6,5); // capacitivesensor(output, input)
+
+void setup()                    
+{
+   cs_1.set_CS_AutocaL_Millis(0xFFFFFFFF);// turn off autocalibrate on channel 1 - just as an example
+   cs_2.set_CS_AutocaL_Millis(0xFFFFFFFF);// turn off autocalibrate on channel 1 - just as an example
+   Serial.begin(9600);
+   pinMode(LED1,OUTPUT);
+   pinMode(LED2,OUTPUT);
+}
+
+void loop()                    
+{
+ long sensor1 =  cs_1.capacitiveSensor(80);
+ long sensor2 =  cs_2.capacitiveSensor(80);
+ int thr = 50;
+ Serial.print(sensor1);  // print sensor output 
+ Serial.print("    ");
+ Serial.println(sensor2);
+ Serial.println("_____");
+
+ 
+   if(sensor1+20 >= thr )
+   {
+    digitalWrite(LED1,HIGH);
+    Serial.print("RIGHT");
+   }
+   else
+   {
+    digitalWrite(LED1,LOW);
+   } 
+   
+    if(sensor2+30 >= thr)
+   {
+    digitalWrite(LED2,HIGH);
+        Serial.print("LEFT");
+
+   }
+   else
+   {
+    digitalWrite(LED2,LOW);
+   } 
+}
