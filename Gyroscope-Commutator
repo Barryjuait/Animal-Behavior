@@ -1,0 +1,96 @@
+#include <math.h>
+
+#include <Adafruit_Sensor.h>
+
+#include <Adafruit_L3GD20_U.h>
+#include <AccelStepper.h>
+
+#define rad2deg(rad) (rad * 180.0 / M_PI)
+Adafruit_L3GD20_Unified gyro;
+AccelStepper stepper(AccelStepper::DRIVER, 2, 3);
+
+int prev_angle = 0;
+bool is_spinning = false;
+const float rot_thresh = 10;
+
+unsigned long prev_time = 0;
+const long intv = 100; //millis
+int curr_angle;
+
+const int SAMPLES = 2;
+int sample_arr[SAMPLES];
+int curr_avg = 0;
+int get_average(int* arr)
+{
+  int _res = 0;
+  for(int i; i < SAMPLES; i++){
+    _res += arr[i];
+  }
+  return (_res / SAMPLES);
+}
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(9600);
+  Serial.println("Starting...");
+  
+  if (!gyro.begin())
+  {
+    Serial.println("Error starting gyro");
+  }
+ Serial.println("Gyro started");
+  gyro.enableAutoRange(true);
+
+  stepper.setMaxSpeed(6000);
+  //stepper.setAcceleration(0.5);
+  //stepper.setSpeed(500);
+}
+
+void loop() {
+  //static int counter = 0;
+  //static int totalAngle = 0;
+  sensors_event_t e;
+  //gyro.getEvent(&e);
+ 
+  //Serial.println(curr_angle);
+  unsigned long curr_time = millis();
+  if (curr_time - prev_time >= intv) {
+    for(int i; i < SAMPLES; i++)
+    {
+      gyro.getEvent(&e);
+      curr_angle = rad2deg((int)e.gyro.y);
+      sample_arr[i] = curr_angle;      
+    }
+     curr_avg = get_average(sample_arr);
+//     Serial.println("-----");
+//      for(int i; i < SAMPLES; i++){
+//        Serial.println(sample_arr[i]);
+//      }
+//     Serial.println("+++++");
+    
+    
+     prev_time = curr_time;
+  }
+
+  if (5 < curr_avg)
+  {
+    stepper.setSpeed(2000);
+    stepper.run();
+  }
+
+  else if (-5 > curr_avg)
+  {
+    stepper.setSpeed(-2000);
+    stepper.run();
+  }
+  else{
+    stepper.stop();
+  }
+
+//Serial.println(curr_avg);
+ //stepper.setSpeed(3000);  //prev_time = curr_time;
+  //prev_angle = curr_angle;
+  //stepper.setSpeed(100);
+  //stepper.runSpeed();
+
+}
