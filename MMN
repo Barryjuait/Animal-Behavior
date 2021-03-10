@@ -1,0 +1,53 @@
+
+
+// constants won't change. Used here to set a pin number:
+const int speaker =  11;// the number of the LED pin
+
+void setup() {
+  // set the digital pin as output:
+  pinMode(speaker, OUTPUT);
+  Serial.begin(9600);
+  
+}
+
+void loop() {
+  // here is where you'd put code that needs to be running all the time.
+  //int mult = 10; 
+  //int dur = 9;
+  int count = 1;
+  int rep = 0;
+  for (int i = 1; i <= 100; i++)
+  {
+    int comp = random(1,5);
+    //for debugging:
+    Serial.println("Tone #"); 
+    Serial.println(i); 
+    //Serial.println(mult); 
+    Serial.println("      ");
+     
+    if (count == comp  && !(rep<4))
+    {
+      rep = 0;
+      tone(speaker, 5000);
+      delay(60);
+      //mult = mult+10;
+      Serial.println("ODDBALL FREQ");
+    }
+    else if (count + 1 == comp && !(rep<4))
+    {
+      rep = 0;
+      tone(speaker, 1000);
+      delay(160);
+      //dur = dur+10;
+      Serial.println("ODDBALL DUR");
+    }
+    else
+    {
+      tone(speaker, 1000);   
+      delay(60);
+    }
+    rep = 1 + rep;
+    noTone(speaker);
+    delay(300);
+  }
+}
